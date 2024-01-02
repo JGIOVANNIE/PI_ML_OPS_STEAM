@@ -1,8 +1,5 @@
 # relizaremos el deploy de nuestras consultas 
 from fastapi import FastAPI
-
-app = FastAPI()
-
 from typing import List, Dict, Union
 import pandas as pd
 import pyarrow
@@ -10,6 +7,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.decomposition import PCA
 import numpy as np 
 
+app = FastAPI(title='STEAM Games', description='Esta es una aplicación para realizar consultas sobre todo el mundo de STEAM.')
 
 
 df_PTG = pd.read_parquet('PI_ML_OPS_STEAM/API/PlayTimeGenre.parquet')
