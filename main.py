@@ -10,9 +10,9 @@ import numpy as np
 app = FastAPI(title='STEAM Games', description='Esta es una aplicación para realizar consultas sobre todo el mundo de STEAM.')
 
 
-df_PTG = pd.read_parquet('PI_ML_OPS_STEAM/API/PlayTimeGenre.parquet')
-df_UFG = pd.read_parquet('PI_ML_OPS_STEAM/API/UserForGenre.parquet')
-df_UsersR = pd.read_parquet('PI_ML_OPS_STEAM/API/UsersR.parquet')
+df_PTG = pd.read_parquet('C:/Users/hp/Desktop/HENRY/Soy_Henry_Modulos/PI_ML/PI_ML_OPS_STEAM/API/PlayTimeGenre.parquet')
+df_UFG = pd.read_parquet('C:/Users/hp/Desktop/HENRY/Soy_Henry_Modulos/PI_ML/PI_ML_OPS_STEAM/API/UserForGenre.parquet')
+df_UsersR = pd.read_parquet('C:/Users/hp/Desktop/HENRY/Soy_Henry_Modulos/PI_ML/PI_ML_OPS_STEAM/API/UsersR.parquet')
 
 
 @app.get("/play_time_genre/{genero}")
@@ -37,7 +37,7 @@ async def play_time_genre(genero: str) -> Dict[str, int]:
         }
 
 @app.get("/user_for_genre/{genero}")
-async def user_for_genre(genero: str) -> Dict[str, Union[str, List[Dict[str, int]]]]:
+async def user_for_genre(genero: str) -> Dict[str, Union[str, List[Dict[str, float]]]]:
         # Filtrar los datos por género
         df_genero = df_UFG[df_UFG['genres'].str.lower().str.contains(genero.lower(), na=False)]
 
@@ -45,7 +45,7 @@ async def user_for_genre(genero: str) -> Dict[str, Union[str, List[Dict[str, int
             return {"mensaje": f"No hay datos para el género: {genero}"}
 
         # Convertir la columna playtime_forever de minutos a horas
-        df_genero['playtime_forever'] = (df_genero['playtime_forever'] / 60).round(2)
+        df_genero.loc[:, 'playtime_forever'] = (df_genero['playtime_forever'] / 60).round(2)
 
         # Agrupar los datos por usuario y año
         df_agrupado = df_genero.groupby(['user_id', 'año']).agg({'playtime_forever': 'sum'}).reset_index()
@@ -64,7 +64,7 @@ async def user_for_genre(genero: str) -> Dict[str, Union[str, List[Dict[str, int
         }
 
 @app.get("/users_recommend/{año}")
-async def users_recommend(año: int) -> List[Dict[str, str]]:
+async def users_recommend(año: int) -> List[Dict[str, int]]:
         # Filtrar las reseñas que son recomendaciones y tienen un análisis de sentimiento positivo o neutral
         filtro = df_UsersR[(df_UsersR['recommend'] == True) & (df_UsersR['sentiment_analysis'].isin([1, 2]))]
 
@@ -87,7 +87,7 @@ async def users_recommend(año: int) -> List[Dict[str, str]]:
 
 
 @app.get("/users_not_recommend/{año}")
-async def users_not_recommend(año: int) -> List[Dict[str, str]]:
+async def users_not_recommend(año: int) -> List[Dict[str, int]]:
         # Filtrar las reseñas que no son recomendaciones y tienen un análisis de sentimiento negativo
         filtrado = df_UsersR[(df_UsersR['recommend'] == False) & (df_UsersR['sentiment_analysis'].isin([0]))]
 
@@ -131,7 +131,7 @@ async def sentiment_analysis(año: int) -> Dict[str, int]:
 
 
 @app.get("/recomendacion_usuario/{id_usuario}")
-async def recomendacion_usuario(id_usuario: int) -> dict:
+async def recomendacion_usuario(id_usuario: str) -> dict:
     # Creamos una matriz de usuarios x juegos con recomendaciones
     matriz_user_item = df_UsersR.pivot_table(index='user_id', columns='title', values='recommend', fill_value=0)
     # Calculamos la  similitud del coseno entre usuarios
