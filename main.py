@@ -87,7 +87,7 @@ async def users_recommend(anio: int) -> List[Dict[str, str]]:
 
 
 @app.get('/users_not_recommend/{anio}')
-async def users_not_recommend(anio: int) -> List[Dict[str, int]]:
+async def users_not_recommend(anio: int) -> List[Dict[str]]:
         # Filtrar las reseñas que no son recomendaciones y tienen un análisis de sentimiento negativo
         filtrado = df_UsersR[(df_UsersR['recommend'] == False) & (df_UsersR['sentiment_analysis'].isin([0]))]
 
@@ -107,7 +107,7 @@ async def users_not_recommend(anio: int) -> List[Dict[str, int]]:
         ]
 
 @app.get('/sentiment_analysis/{anio}')
-async def sentiment_analysis(anio: int) -> Dict[str, int]:
+async def sentiment_analysis(anio: int) -> Dict[str]:
         # Filtramos el dataframe por año
         df_filtrado = df_UsersR[df_UsersR['año'] == anio]
 
