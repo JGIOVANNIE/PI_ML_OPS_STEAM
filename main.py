@@ -10,9 +10,9 @@ import numpy as np
 app = FastAPI(title='STEAM Games', description='Esta es una aplicación para realizar consultas sobre todo el mundo de STEAM.')
 
 
-df_PTG = pd.read_parquet('C:/Users/hp/Desktop/HENRY/Soy_Henry_Modulos/PI_ML/PI_ML_OPS_STEAM/API/PlayTimeGenre.parquet')
-df_UFG = pd.read_parquet('C:/Users/hp/Desktop/HENRY/Soy_Henry_Modulos/PI_ML/PI_ML_OPS_STEAM/API/UserForGenre.parquet')
-df_UsersR = pd.read_parquet('C:/Users/hp/Desktop/HENRY/Soy_Henry_Modulos/PI_ML/PI_ML_OPS_STEAM/API/UsersR.parquet')
+df_PTG = pd.read_parquet('./API/PlayTimeGenre.parquet')
+df_UFG = pd.read_parquet('./API/UserForGenre.parquet')
+df_UsersR = pd.read_parquet('./API/UsersR.parquet')
 
 
 @app.get("/play_time_genre/{genero}")
@@ -24,7 +24,7 @@ async def play_time_genre(genero: str) -> Dict[str, int]:
             return {"mensaje": f"No hay datos para el género: {genero}"}
 
     # Convertir la columna playtime_forever de minutos a horas
-        df_genero['playtime_forever'] = (df_genero['playtime_forever'] / 60).round(2)
+        df_genero.loc[:, 'playtime_forever'] = (df_genero['playtime_forever'] / 60).round(2)
 
     # Agrupar los datos por año y sumar las horas jugadas
         df_agrupado = df_genero.groupby('año')['playtime_forever'].sum().reset_index()
@@ -63,13 +63,13 @@ async def user_for_genre(genero: str) -> Dict[str, Union[str, List[Dict[str, flo
             "Horas jugadas": horas_jugadas
         }
 
-@app.get("/users_recommend/{año}")
-async def users_recommend(año: int) -> List[Dict[str, int]]:
+@app.get('/users_recommend/{anio}')
+async def users_recommend(anio: int) -> List[Dict[str, str]]:
         # Filtrar las reseñas que son recomendaciones y tienen un análisis de sentimiento positivo o neutral
         filtro = df_UsersR[(df_UsersR['recommend'] == True) & (df_UsersR['sentiment_analysis'].isin([1, 2]))]
 
         # Filtrar los juegos que se lanzaron en el año dado
-        filtro = filtro[filtro['año'] == año]
+        filtro = filtro[filtro['año'] == anio]
 
         # Contar las recomendaciones para cada juego
         cuenta_de_recomendaciones = filtro['title'].value_counts()
@@ -86,13 +86,13 @@ async def users_recommend(año: int) -> List[Dict[str, int]]:
             return [{"mensaje": "No hay suficientes juegos con recomendaciones para el año dado."}]
 
 
-@app.get("/users_not_recommend/{año}")
-async def users_not_recommend(año: int) -> List[Dict[str, int]]:
+@app.get('/users_not_recommend/{anio}')
+async def users_not_recommend(anio: int) -> List[Dict[str, int]]:
         # Filtrar las reseñas que no son recomendaciones y tienen un análisis de sentimiento negativo
         filtrado = df_UsersR[(df_UsersR['recommend'] == False) & (df_UsersR['sentiment_analysis'].isin([0]))]
 
         # Filtrar los juegos que se lanzaron en el año dado
-        filtrado = filtrado[filtrado['año'] == año]
+        filtrado = filtrado[filtrado['año'] == anio]
 
         # Contar las no recomendaciones para cada juego
         cuenta_negativa = filtrado['title'].value_counts()
@@ -106,17 +106,17 @@ async def users_not_recommend(año: int) -> List[Dict[str, int]]:
             {"Puesto 3": top_juegos_norecomendados[2]}
         ]
 
-@app.get("/sentiment_analysis/{año}")
-async def sentiment_analysis(año: int) -> Dict[str, int]:
+@app.get('/sentiment_analysis/{anio}')
+async def sentiment_analysis(anio: int) -> Dict[str, int]:
         # Filtramos el dataframe por año
-        df_filtrado = df_UsersR[df_UsersR['año'] == año]
+        df_filtrado = df_UsersR[df_UsersR['año'] == anio]
 
         # Contar la cantidad de registros de reseñas que se encuentren categorizados con un análisis de sentimiento
         contar_sentimientos = df_filtrado['sentiment_analysis'].value_counts()
 
         # Crear un nuevo diccionario con el formato deseado
         sentimientos = {
-            f"En el año {año} hubo comentarios": {
+            f"En el año {anio} hubo comentarios": {
                 "positivos": contar_sentimientos.get(2, 0),
                 "neutrales": contar_sentimientos.get(1, 0),
                 "negativos": contar_sentimientos.get(0, 0)

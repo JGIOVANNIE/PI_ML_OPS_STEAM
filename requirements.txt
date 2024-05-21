@@ -3,5 +3,6 @@ scikit-learn
 pyarrow
 fastapi
 numpy
-uvicorn[standard]
+uvicorn
 gunicorn
+ipython
