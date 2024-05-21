@@ -172,4 +172,6 @@ async def recomendacion_usuario(id_usuario: str) -> dict:
 
     return resultado_recomendacion        
   
-
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
