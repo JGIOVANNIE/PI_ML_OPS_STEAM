@@ -10,15 +10,9 @@ import numpy as np
 app = FastAPI(title='STEAM Games', description='Esta es una aplicación para realizar consultas sobre todo el mundo de STEAM.')
 
 
-<<<<<<< HEAD
 df_PTG = pd.read_parquet('./API/PlayTimeGenre.parquet')
 df_UFG = pd.read_parquet('./API/UserForGenre.parquet')
 df_UsersR = pd.read_parquet('./API/UsersR.parquet')
-=======
-df_PTG = pd.read_parquet('C:\\Users\\hp\\Desktop\\HENRY\\Soy_Henry_Modulos\\PI_ML\\PI_ML_OPS_STEAM\\API\\PlayTimeGenre.parquet')
-df_UFG = pd.read_parquet('C:\\Users\\hp\\Desktop\\HENRY\\Soy_Henry_Modulos\\PI_ML\\PI_ML_OPS_STEAM\\API\\UserForGenre.parquet')
-df_UsersR = pd.read_parquet('C:\\Users\\hp\\Desktop\\HENRY\\Soy_Henry_Modulos\\PI_ML\\PI_ML_OPS_STEAM\\API\\UsersR.parquet')
->>>>>>> d26004c04664b5a02a11b5e0f5113cdd97b30acf
 
 
 @app.get("/play_time_genre/{genero}")
