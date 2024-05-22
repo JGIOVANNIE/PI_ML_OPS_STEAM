@@ -3,15 +3,11 @@ from fastapi import FastAPI
 from typing import List, Dict, Union, Any
 import pandas as pd
 import pyarrow
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.decomposition import PCA
 import numpy as np 
 import joblib
 
 app = FastAPI(title='STEAM Games', description='Esta es una aplicación para realizar consultas sobre todo el mundo de STEAM.')
 
-
-df_PTG = pd.read_parquet('./API/PlayTimeGenre.parquet')
 df_UFG = pd.read_parquet('./API/UserForGenre.parquet')
 df_UsersR = pd.read_parquet('./API/UsersR.parquet')
 modelo = pd.read_parquet('./API/modelo.parquet')
@@ -20,13 +16,10 @@ modelo = pd.read_parquet('./API/modelo.parquet')
 @app.get("/play_time_genre/{genero}")
 async def play_time_genre(genero: str) -> Dict[str, int]:
     # Filtrar los datos por género
-        df_genero = df_PTG[df_PTG['genres'].str.lower().str.contains(genero.lower())]
+        df_genero = df_UFG[df_UFG['genres'].str.lower().str.contains(genero.lower())]
 
         if df_genero.empty:
             return {"mensaje": f"No hay datos para el género: {genero}"}
-
-    # Convertir la columna playtime_forever de minutos a horas
-        df_genero.loc[:, 'playtime_forever'] = (df_genero['playtime_forever'] / 60).round(2)
 
     # Agrupar los datos por año y sumar las horas jugadas
         df_agrupado = df_genero.groupby('año')['playtime_forever'].sum().reset_index()
