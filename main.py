@@ -4,7 +4,7 @@ from typing import List, Dict, Union, Any
 import pandas as pd
 import pyarrow
 import numpy as np 
-import joblib
+
 
 app = FastAPI(title='STEAM Games', description='Esta es una aplicación para realizar consultas sobre todo el mundo de STEAM.')
 
